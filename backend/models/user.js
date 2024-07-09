@@ -25,4 +25,4 @@ const User = sequelize.define("User", {
     timestamp: true
 });
 
-module.exports = "User"
+module.exports = User;
