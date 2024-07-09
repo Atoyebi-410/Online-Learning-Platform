@@ -5,8 +5,8 @@ import { FOREIGNKEYS } from "sequelize/lib/query-types";
 
 // define the association between the models
 
-User.hasMany(Course, { as: "course", foreignkey: "userid" });
-Course.belongsTo(User, {as: "instructor", foreignkey: "userid" });
+User.hasMany(Course, { as: "Course", foreignkey: "userId" });
+Course.belongsTo(User, {as: "Instructor", foreignkey: "userId" });
 
 module.exports = {
     sequelize,
