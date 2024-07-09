@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
-import 'dotenv/onfig';
+import 'dotenv/config';
 
-const sequelize = new Sequelize (process.env.DB_NAME, process.env.DB_USER, process.env.DB_pass, {
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_pass, {
     host: process.env.DB_HOST,
     dialect: "postgres"
 });
