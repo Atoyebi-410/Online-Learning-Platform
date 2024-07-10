@@ -1,7 +1,7 @@
-import sequelize from "../config/database";
-import { DataTypes } from "sequelize";
+const sequelize = require("../config/database.js");
+const { DataTypes } = require("sequelize");
 
-const User = sequelize.define("User", {
+const User = sequelize.define('User', {
     firstName: {
         type: DataTypes.STRING,
         allowNull: false
@@ -13,12 +13,14 @@ const User = sequelize.define("User", {
     email: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+            isEmail: true
+        },
         unique: true
     },
     password: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
     }
 }, {
     tableName: "Users",

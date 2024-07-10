@@ -1,7 +1,7 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database";
+const { DataTypes } =require("sequelize");
+const sequelize = require("../config/database.js");
 
-const Course = sequelize.Define("Course", {
+const Course = sequelize.define("Course", {
     title: {
         type: DataTypes.STRING,
         allowNull: false

@@ -1,6 +1,6 @@
-import sequelize from "../config/database";
-import User from "./user";
-import Course from "./course";
+const sequelize = require("../config/database.js");
+const User = require("./user");
+const Course =require("./course");
 
 
 // define the association between the models
