@@ -15,4 +15,5 @@ const Course = sequelize.define("Course", {
     timestamps: true
 });
 
+
 module.exports = Course

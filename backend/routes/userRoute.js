@@ -1,37 +1,7 @@
 const express = require("express");
-const { User, Course } = require("../models")
+const { Course } = require("../models") 
 
 const router = express.Router();
-
-// create a new user
-router.post("/register", async (req, res) => {
-    try {
-        
-        const { firstName, lastName, email, password } = req.body;
-
-        // check for missing fields
-        if ( !firstName || !lastName || !email || !password) {
-            res.status(400).json({error: "All fields are required"})
-        }
-
-        // create new user based on the model created
-        const newUser = await User.create({ firstName, lastName, email, password })
-        res.status(201).json(newUser);
-    } catch (error) {
-        res.status(400).json({error: error.message})
-    }
-});
-
-// get all the existing users
-router.get("/users", async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-        
-    }
-})
 
 // create a new course
 router.post("/course", async (req, res) => {
@@ -44,6 +14,7 @@ router.post("/course", async (req, res) => {
     }
 });
 
+// get all courses
 router.get("/courses", async (req, res) => {
     try {
         const courses = await Course.findAll();
@@ -53,5 +24,10 @@ router.get("/courses", async (req, res) => {
         
     }
 })
+
+// Protected route example
+router.get('/protected', authMiddleware, (req, res) => {
+    res.json({ message: 'This is a protected route', user: req.user });
+  });
 
 module.exports = router;
