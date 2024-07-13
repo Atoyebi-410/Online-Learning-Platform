@@ -1,8 +1,8 @@
 const express = require("express");
 const { User } = require("../models");
-const { validationResult } = require("express-validator");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const authMiddleware = require('../middleware/authMiddleware');
 const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 
@@ -13,7 +13,7 @@ router.post("/register", [
     // check for missing fields and password requirements
     body('firstName').notEmpty().withMessage('First name is required'),
     body('lastName').notEmpty().withMessage('Last name is required'),
-    body('email').noEmpty().withMessage('invalid email'),
+    body('email').notEmpty().withMessage('invalid email'),
     body('password').isLength({min: 6}).withMessage('Password must be at least 6 length long')
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -67,7 +67,7 @@ router.post("/login", [
             }
         };
 
-        jwt.sign(payload, process.env.JWT_SECRET, { expireIn: '1h'}, (err, token) => {
+        jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h'}, (err, token) => {
             if (err) throw err;
             res.json({ token })
         })

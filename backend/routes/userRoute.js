@@ -1,6 +1,6 @@
 const express = require("express");
 const { Course } = require("../models") 
-
+const authMiddleware = require("../middleware/authMiddleware")
 const router = express.Router();
 
 // create a new course
