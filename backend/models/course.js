@@ -7,13 +7,21 @@ const Course = sequelize.define("Course", {
         allowNull: false
     },
     description: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false
+    },
+    instructorId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
     }
-}, {
+}, 
+{
     tableName: "Courses",
     timestamps: true
-});
+}
+);
+
+
 
 
 module.exports = Course

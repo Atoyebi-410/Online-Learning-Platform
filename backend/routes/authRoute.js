@@ -41,14 +41,15 @@ router.post("/register", [
     body('firstName').notEmpty().withMessage('First name is required'),
     body('lastName').notEmpty().withMessage('Last name is required'),
     body('email').notEmpty().withMessage('invalid email'),
-    body('password').isLength({min: 6}).withMessage('Password must be at least 6 length long')
+    body('password').isLength({min: 6}).withMessage('Password must be at least 6 length long'),
+    body('role').isIn(['student', 'instructor']).withMessage('Invalid role')
 ], async (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()) {
         return res.status(400).json({errors: errors.array() });
     }
 
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, role } = req.body;
 
     try {
         const existingUser = await User.findOne({ where: { email } })
@@ -62,7 +63,9 @@ router.post("/register", [
             firstName, 
             lastName, 
             email, 
-            password: hashedPassword 
+            password: hashedPassword,
+            role,
+            isVerified: false 
         });
         
         // Generate email verification token
@@ -105,14 +108,15 @@ router.post("/login", [
         const payload = {
             user: {
                 id: user.id,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
         };
 
         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h'}, (err, token) => {
             if (err) throw err;
             res.json({ token })
-        })
+        });
     } catch (error) {
         console.error('Error logging in:', error);
         res.status(500).json({ error: 'Server error' })
@@ -152,27 +156,18 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
   }
 );
 
+// POST route to logout
+router.post('/logout', (req, res) => {
+  // Clear any session/token information from client-side storage (e.g., cookies, localStorage)
+  res.clearCookie('jwtToken'); // Example for clearing cookie-based token
+  res.status(200).json({ message: 'Logout successful' });
+});
 
 
-// get all the existing users
-// router.get("/users", async (req, res) => {
-//     try {
-//         const users = await User.findAll();
-//         res.status(200).json(users);
-//     } catch (error) {
-//         res.status(400).json({ error: error.message });
-        
-//     }
-// });
 
 // Protected route example
-router.get('/protected', authMiddleware, (req, res) => {
-    res.json({ message: 'This is a protected route', user: req.user });
-  });
+// router.get('/protected', authMiddleware, (req, res) => {
+//     res.json({ message: 'This is a protected route', user: req.user });
+//   });
 
-module.exports = router
-
-// function sendVerificationEmail(email, token) {
-//     // Implement email sending logic here
-//     console.log(`Verification email sent to ${email} with token: ${token}`);
-//   }
+module.exports = router;

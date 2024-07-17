@@ -23,6 +23,10 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    role: {
+        type: DataTypes.ENUM('student', 'instructor'),
+        allowNull: false,
+    },
     isVerified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
