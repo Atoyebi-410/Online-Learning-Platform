@@ -18,11 +18,8 @@ app.set('views', path.join(__dirname, 'views'));
 // Middleware tp parse json
 app.use(express.json());
 
-// middleware to make static files readable
-// app.use(express.static("../frontend/public"));
-
 // Middleware to make static files readable
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 // Initialize session
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
@@ -41,9 +38,9 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
 
 
-// app.get("/", (req, res) => {
-//     res.render("../../frontend/views/index.ejs")
-// })
+app.get("/", (req, res) => {
+  res.render("../../frontend/views/index.ejs")
+})
 
 
 // Synchronize the database
