@@ -1,7 +1,7 @@
 <%- include("partials/header.ejs") %>
 
 <div class="container register">
-    <form action="api/auth/login" method="POST">
+    <form action="api/auth/register" method="POST">
         <div>
             <h3>Sign Up</h3>
         </div>
@@ -22,7 +22,14 @@
                 <p><%= messages.error %></p>
             </div>
         <% } %>
-
+        <div class="mb-3">
+            <label for="exampleInputText1" class="form-label">First Name</label>
+            <input type="text" name="firstName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Last Name</label>
+            <input type="text" name="lastName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+        </div>
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label">Email address</label>
           <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
@@ -31,12 +38,19 @@
           <label for="exampleInputPassword1" class="form-label">Password</label>
           <input type="password" name="password" class="form-control" id="exampleInputPassword1">
         </div>
-        
+        <div class="mb-3 form-check">
+            <label for="exampleInputText1" class="form-label">Select Role</label>
+            <select class="form-control" name="role" id="role" required>
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+            </select>
+        </div>
         <div class="col-xl-12">
-            <button type="submit" class="boxed_btn_orange">Log in</button>
+            <button type="submit" class="boxed_btn_orange">Sign Up</button>
         </div>
-        <div>
-            <p class="doen_have_acc">Don't have an account? <a class="dont-hav-acc" href="/register">Sign Up</a>
-        </div>
+        <!-- <div>
+            <a href="/auth/google">Register with Google</a>
+        </div> -->
       </form>
 </div>
+

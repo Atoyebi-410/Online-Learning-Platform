@@ -827,8 +827,13 @@ h3 {
   }
 }
 
+.register{
+  margin-top: 200px;
+}
+
 /* line 15, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_header.scss */
 .header-area .main-header-area {
+  background-color: #a64eee;
   padding: 0 150px;
 }
 

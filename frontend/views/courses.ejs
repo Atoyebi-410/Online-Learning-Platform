@@ -1,0 +1,40 @@
+<%- include("partials/header.ejs") %>
+    <!-- header-end -->
+        <!-- bradcam_area_start -->
+        <div class="bradcam_area breadcam_bg overlay2">
+            <h3>Our Courses</h3>
+        </div>
+        <!-- bradcam_area_end -->
+
+    <!-- popular_courses_start -->
+    <div class="popular_courses plus_padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="section_title text-center mb-100">
+                        <h3>Popular Courses</h3>
+                        <p>Your domain control panel is designed for ease-of-use and <br> allows for all aspects of your
+                            domains.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="courses">
+        <% courses.forEach(course => { %>
+            <div class="course">
+                <h2><%= course.title %></h2>
+                <p><%= course.description %></p>
+                <% if (loggedIn) { %>
+                    <form action="/api/courses/enroll" method="POST">
+                        <input type="hidden" name="courseId" value="<%= course.id %>">
+                        <button type="submit">Enroll</button>
+                    </form>
+                <% } else { %>
+                    <p><a href="/login">Login to enroll</a></p>
+                <% } %>
+            </div>
+        <% }); %>
+    </div>
+            

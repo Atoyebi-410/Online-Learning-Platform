@@ -1,17 +1,31 @@
 const express = require('express');
 const router = express.Router();
+const { body, validationResult } = require('express-validator');
 const { authMiddleware, checkRole } = require('../middleware/authMiddleware');
 const Course = require('../models/course');
 
-// Create a course (Instructors only)
-router.post('/courses', authMiddleware, checkRole(['instructor']), async (req, res) => {
+
+// Handle course upload
+router.post('/upload', [
+  body('title').notEmpty().withMessage('Title is required'),
+  body('description').notEmpty().withMessage('Description is required')
+], authMiddleware, checkRole, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('errors', errors.array());
+    return res.redirect('/upload');
+  }
+
+  const { title, description } = req.body;
+
   try {
-    const { title, description } = req.body;
-    const instructorId = req.user.id;
-    const course = await Course.create({ title, description, instructorId });
-    res.status(201).json(course);
+      const course = await Course.create({ title, description, instructorId: req.user.id });
+      req.flash('message', 'Course uploaded successfully');
+      res.redirect('/upload');
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create course' });
+      console.error('Error uploading course:', error);
+      req.flash('error', 'Server error');
+      return res.redirect('/upload')
   }
 });
 
