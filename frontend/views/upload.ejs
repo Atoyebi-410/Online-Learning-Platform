@@ -65,7 +65,7 @@
     <!-- header-end -->
 
 <div class="container register">
-    <form action="api/course/upload" method="POST">
+    <form action="/api/course/upload" method="POST">
         <div>
             <h3>Upload Course</h3>
         </div>
@@ -102,5 +102,15 @@
         </div> -->
       </form>
 </div>
+<div class="courses">
+    <% courses.forEach(course => { %>
+        <div class="course">
+            <h2><%= course.title %></h2>
+            <p><%= course.description %></p>
+            <a href="/course/<%= course.id %>">View Course</a>
+        </div>
+    <% }); %>
+</div>
+
 
 <%- include("partials/footer.ejs") %>

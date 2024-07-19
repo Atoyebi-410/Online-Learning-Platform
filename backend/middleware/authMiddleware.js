@@ -1,25 +1,35 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const { User } = require('../models')
 
-const authMiddleware = (req, res, next) => {
-  const token = req.header('Authorization') ? req.header('Authorization').replace('Bearer ', '') : null;
+const authMiddleware = async (req, res, next) => {
+  const token = req.cookies.token;
+  // req.header('Authorization') ? req.header('Authorization').replace('Bearer ', '') : null;
 
   if (!token) {
-    return res.status(401).json({ error: 'No token, authorization denied' });
+    req.flash('error', 'No token, authorization denied');
+    return res.redirect('/login');
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.user;
+    const user = await User.findByPk(decoded.id);
+    if (!user) {
+      req.flash('error', 'Authorization denied, user not found');
+      return res.redirect('/login');
+    }
+    req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Token is not valid' });
+    req.flash('error', 'Token is not valid');
+    res.redirect('/login');
   }
 };
 
 const checkRole = (roles) => (req, res, next) => {
   if (!roles.includes(req.user.role)) {
-    return res.status(403).json({ error: 'Forbidden' });
+    req.flash('error', 'Authorization denied, insufficient privileges');
+    return res.redirect('/');
   }
   next();
 };

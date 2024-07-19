@@ -6,34 +6,21 @@
         </div>
         <!-- bradcam_area_end -->
 
-    <!-- popular_courses_start -->
-    <div class="popular_courses plus_padding">
-        <div class="container">
+
+    <div class="container">
+        <% locals.courses.forEach(course => { %>
             <div class="row">
-                <div class="col-xl-12">
-                    <div class="section_title text-center mb-100">
-                        <h3>Popular Courses</h3>
-                        <p>Your domain control panel is designed for ease-of-use and <br> allows for all aspects of your
-                            domains.</p>
+                <div class="col">
+                    <h2><%= course.title %></h2>
+                    <p><%= course.description %></p>
+                    <div class="col-xl-12">
+                        <form action="/api/course/enroll/<%= course.id %>" method="POST">
+                            <button class="boxed_btn_orange" type="submit">Enroll</button>
+                        </form>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="courses">
-        <% courses.forEach(course => { %>
-            <div class="course">
-                <h2><%= course.title %></h2>
-                <p><%= course.description %></p>
-                <% if (loggedIn) { %>
-                    <form action="/api/courses/enroll" method="POST">
-                        <input type="hidden" name="courseId" value="<%= course.id %>">
-                        <button type="submit">Enroll</button>
-                    </form>
-                <% } else { %>
-                    <p><a href="/login">Login to enroll</a></p>
-                <% } %>
+                
+                
             </div>
         <% }); %>
     </div>

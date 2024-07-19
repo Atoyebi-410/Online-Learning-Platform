@@ -7,8 +7,11 @@ const courseRoutes = require('./routes/courseRoute');
 const lessonRoutes = require('./routes/lessonRoute');
 const bodyParser = require('body-parser');
 const Course = require('./models/course.js');
+const cookieParser = require('cookie-parser');
 const path = require('path')
 const flash = require('connect-flash');
+const { Enrollment} = require('./models')
+const {authMiddleware, checkRole} = require('./middleware/authMiddleware.js');
 require('dotenv').config();
 
 const app = express();
@@ -27,7 +30,7 @@ app.use(express.static('../frontend/public'));
 
 // Initialize session
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
-
+app.use(cookieParser());
 
 // Initialize Passport
 app.use(passport.initialize());
@@ -39,8 +42,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // use routes
 app.use('/api/auth', authRoutes)
-app.use('/api/courses', courseRoutes);
-app.use('/api/lessons', lessonRoutes);
+app.use('/api/course', courseRoutes);
+app.use('/api/lesson', lessonRoutes);
 
 // app.use((req, res, next) => {
 //   res.locals.success = req.flash('success');
@@ -69,20 +72,40 @@ app.get('/login', (req, res) => {
   res.render('../../frontend/views/login.ejs', { messages: req.flash() || {} });
 });
 
-// render upload page
-app.get('/upload', (req, res) => {
-  res.render('../../frontend/views/upload.ejs', { message: req.flash('message') });
+// // render upload page
+// app.get('/upload', (req, res) => {
+//   res.render('../../frontend/views/upload.ejs', { message: req.flash('message') });
+// });
+
+// Route to render the upload page
+app.get('/upload', authMiddleware, checkRole('instructor'), async (req, res) => {
+  try {
+      const courses = await Course.findAll({ where: { instructorId: req.user.id } });
+      res.render('../../frontend/views/upload.ejs', { courses, error: req.flash('error'), success: req.flash('success') });
+  } catch (error) {
+      console.error('Error fetching courses:', error);
+      req.flash('error', 'Server error');
+      res.redirect('/');
+  }
 });
+
+// render upload page
+// app.get('/courses', (req, res) => {
+//   res.render('../../frontend/views/courses.ejs', { message: req.flash('message') });
+// });
 
 app.get('/courses', async (req, res) => {
   try {
-      const courses = await Course.findAll();
+      const courses = await Course.findAll({
+        attributes: ['id', 'title', 'briefDescription']
+      });
       res.render('../../frontend/views/courses', { courses, loggedIn: req.isAuthenticated() });
   } catch (error) {
       console.error('Error fetching courses:', error);
       res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 app.get('/logout', (req, res) => {
   // Clear any session/token information from client-side storage (e.g., cookies, localStorage)
@@ -91,7 +114,7 @@ app.get('/logout', (req, res) => {
 });
 
 // Synchronize the database
-sequelize.sync({ force: true })
+sequelize.sync({ alter: true })
   .then(() => {
     console.log('Database synchronized');
   })

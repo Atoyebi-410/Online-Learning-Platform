@@ -2,18 +2,29 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { authMiddleware, checkRole } = require('../middleware/authMiddleware');
-const Course = require('../models/course');
+const { Course, User, Enrollment } = require('../models');
 
+// Route to render the upload page
+router.get('/upload', authMiddleware, checkRole('instructor'), async (req, res) => {
+  try {
+      const courses = await Course.findAll({ where: { instructorId: req.user.id } });
+      res.render('../../frontend/views/upload.ejs', { courses, error: req.flash('error'), success: req.flash('success') });
+  } catch (error) {
+      console.error('Error fetching courses:', error);
+      req.flash('error', 'Server error');
+      res.redirect('/');
+  }
+});
 
 // Handle course upload
 router.post('/upload', [
   body('title').notEmpty().withMessage('Title is required'),
   body('description').notEmpty().withMessage('Description is required')
-], authMiddleware, checkRole, async (req, res) => {
+], authMiddleware, checkRole('instructor'), async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     req.flash('errors', errors.array());
-    return res.redirect('/upload');
+    return res.redirect('/api/course/upload');
   }
 
   const { title, description } = req.body;
@@ -21,11 +32,11 @@ router.post('/upload', [
   try {
       const course = await Course.create({ title, description, instructorId: req.user.id });
       req.flash('message', 'Course uploaded successfully');
-      res.redirect('/upload');
+      res.redirect('/api/course/upload');
   } catch (error) {
       console.error('Error uploading course:', error);
       req.flash('error', 'Server error');
-      return res.redirect('/upload')
+      return res.redirect('/api/course/upload')
   }
 });
 
@@ -71,15 +82,15 @@ router.get('/courses', async (req, res) => {
 });
 
 // Enroll in a course (Students)
-router.post('/courses/:id/enroll', authMiddleware, checkRole(['student']), async (req, res) => {
+router.post('/enroll/:courseId', authMiddleware, checkRole(['student']), async (req, res) => {
   try {
-    const courseId = req.params.id;
+    const {courseId} = req.params;
     const userId = req.user.id; // Assuming the authenticated user ID is available in req.user
 
-    // Find the course by ID
-    const course = await Course.findByPk(courseId);
+    // Check if the course exists
+    const course = await Course.findOne({ where: { id: courseId } });
     if (!course) {
-      return res.status(404).json({ message: 'Course not found' });
+        return res.status(404).json({ message: 'Course not found' });
     }
 
     // Check if the student is already enrolled
@@ -87,16 +98,19 @@ router.post('/courses/:id/enroll', authMiddleware, checkRole(['student']), async
       where: { studentId: userId, courseId },
     });
     if (existingEnrollment) {
-      return res.status(400).json({ message: 'You are already enrolled in this course' });
+      req.flash('error', 'You are already enrolled in this course.');
+      return res.redirect('/courses');
     }
 
     // Enroll the student in the course
     await Enrollment.create({ studentId: userId, courseId });
 
-    res.status(200).json({ message: 'Enrolled in course successfully' });
+    req.flash('success', 'You have successfully enrolled in the course.');
+    res.redirect('/courses');
   } catch (error) {
     console.error('Error enrolling in course:', error);
-    res.status(500).json({ message: 'Server error' });
+    req.flash('error', 'Failed to enroll in course.');
+    res.redirect('/courses');
   }
 });
 

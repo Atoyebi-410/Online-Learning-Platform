@@ -14,7 +14,7 @@ Course.belongsTo(User, {as: "Instructor", foreignkey: "userId" });
 Course.hasMany(Lesson, { as: "Lessons", foreignKey: "courseId" });
 Lesson.belongsTo(Course, { as: "Course", foreignKey: "courseId" });
 
-User.belongsToMany(Course, { through: Enrollment, as: 'enrolledCourses', foreignKey: 'studentId' });
+User.belongsToMany(Course, { through: Enrollment, as: 'enrolledCourses', foreignKey: 'userId' });
 Course.belongsToMany(User, { through: Enrollment, as: 'students', foreignKey: 'courseId' });
 
 module.exports = {

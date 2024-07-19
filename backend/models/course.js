@@ -7,12 +7,16 @@ const Course = sequelize.define("Course", {
         allowNull: false
     },
     description: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false
     },
     instructorId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+            model: 'Users', // Adjust the model name if necessary
+            key: 'id'
+        }
     }
 }, 
 {
