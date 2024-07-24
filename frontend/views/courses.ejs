@@ -1,4 +1,71 @@
-<%- include("partials/header.ejs") %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/themify-icons.css">
+    <link rel="stylesheet" href="css/nice-select.css">
+    <link rel="stylesheet" href="css/flaticon.css">
+    <link rel="stylesheet" href="css/gijgo.css">
+    <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/slicknav.css">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Document</title>
+    
+</head>
+<body>
+    <header>
+        <div class="header-area ">
+            <div id="sticky-header" class="main-header-area">
+                <div class="container-fluid p-0">
+                    <div class="row align-items-center no-gutters">
+                        <div class="col-xl-2 col-lg-2">
+                            <div class="logo-img">
+                                <a href="index.html">
+                                    <img src="img/logo.png" alt="">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-xl-7 col-lg-7">
+                            <div class="main-menu  d-none d-lg-block">
+                                <nav>
+                                    <ul id="navigation">
+                                        <li><a class="active" href="/">home</a></li>
+                                        <li><a href="/course">Courses<i class="ti-angle-down"></i></a>
+                                            <ul class="submenu">
+                                                <li><a href="course_details.html">course details</a></li>
+                                                <li><a href="elements.html">elements</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="about.html">About</a></li>
+                                        <li><a href="contact.html">Contact</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                            <div class="log_chat_area d-flex align-items-center">
+                                <a href="/logout" class="login popup-with-form">
+                                    <i class="flaticon-user"></i>
+                                    <span>log out</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mobile_menu d-block d-lg-none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- header-end -->
+
     <!-- header-end -->
         <!-- bradcam_area_start -->
         <div class="bradcam_area breadcam_bg overlay2">
@@ -6,22 +73,62 @@
         </div>
         <!-- bradcam_area_end -->
 
-
-    <div class="container">
+    <div class="tabs">
+        <button onclick="showTab('allCourses')">All Courses</button>
+        <button onclick="showTab('myCourses')">My Courses</button>
+    </div>
+    <div class="container course-tab">
         <% locals.courses.forEach(course => { %>
             <div class="row">
-                <div class="col">
-                    <h2><%= course.title %></h2>
-                    <p><%= course.description %></p>
-                    <div class="col-xl-12">
-                        <form action="/api/course/enroll/<%= course.id %>" method="POST">
-                            <button class="boxed_btn_orange" type="submit">Enroll</button>
-                        </form>
+                <div class="col-xl-4 col-lg-4  col-md-6">
+                    <div class="single_courses">
+                        <div class="thumb">
+                            <a href="#">
+                                <img src="img/courses/1.png" alt="">
+                            </a>
+                        </div>
+                        <div class="courses_info">
+                            <h3><%= course.title %></h3>
+                            <div class="star_prise d-flex justify-content-between">
+                                <div class="star">
+                                    <p><%= course.description %></p>
+                                </div>
+                                <div class="prise">
+                                    <form action="/api/course/enroll/<%= course.id %>" method="POST">
+                                        <button class="boxed_btn_orange" type="submit">Enroll</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                
             </div>
+        
         <% }); %>
     </div>
+
+    <div id="myCourses" class="tab-content" style="display:none;">
+        <% if (locals.myCourses && locals.myCourses.length > 0) { %>
+            <% myCourses.forEach(course => { %>
+                <div class="course">
+                    <h2><a href="/courses/<%= course.id %>"><%= course.title %></a></h2>
+                </div>
+            <% }); %>
+
+        <% }  else { %>
+            <p>No courses enrolled.</p>
+
+        <% } %>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById(tabName).style.display = 'block';
+        }
+    </script>
+    
             

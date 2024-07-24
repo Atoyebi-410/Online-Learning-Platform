@@ -18,6 +18,10 @@ const Enrollment = sequelize.define('Enrollment', {
       key: 'id',
     },
   },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false, // Ensure this matches your database schema
+  },
 }, {
   timestamps: true,
 });

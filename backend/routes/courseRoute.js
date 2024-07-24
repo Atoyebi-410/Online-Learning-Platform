@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { authMiddleware, checkRole } = require('../middleware/authMiddleware');
-const { Course, User, Enrollment } = require('../models');
+const { Course, Enrollment } = require('../models');
 
 // Route to render the upload page
 router.get('/upload', authMiddleware, checkRole('instructor'), async (req, res) => {
@@ -24,7 +24,7 @@ router.post('/upload', [
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     req.flash('errors', errors.array());
-    return res.redirect('/api/course/upload');
+    return res.redirect('/upload');
   }
 
   const { title, description } = req.body;
@@ -32,52 +32,86 @@ router.post('/upload', [
   try {
       const course = await Course.create({ title, description, instructorId: req.user.id });
       req.flash('message', 'Course uploaded successfully');
-      res.redirect('/api/course/upload');
+      res.redirect('/upload');
   } catch (error) {
       console.error('Error uploading course:', error);
       req.flash('error', 'Server error');
-      return res.redirect('/api/course/upload')
+      return res.redirect('/upload')
   }
 });
 
 // Update a course (Instructors only)
-router.put('/courses/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+router.put('/course/update/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+  const courseId = req.params.id;
+  const { title, description } = req.body;
   try {
-    const { id } = req.params;
-    const { title, description } = req.body;
-    const course = await Course.findByPk(id);
-    if (course.instructorId !== req.user.id) {
-      return res.status(403).json({ error: 'Unauthorized' });
-    }
-    await course.update({ title, description });
-    res.status(200).json(course);
+    await Course.update({ title, description }, { where: { id: courseId } });
+    req.flash('success', 'Course updated successfully');
+    res.redirect('/upload');
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update course' });
+    console.error('Error updating course:', error);
+    req.flash('error', 'Failed to update course');
+    res.redirect(`/course/edit/${courseId}`);
   }
 });
+
+// router.put('/courses/update/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { title, description } = req.body;
+//     const course = await Course.findByPk(id);
+//     if (course.instructorId !== req.user.id) {
+//       return res.status(403).json({ error: 'Unauthorized' });
+//     }
+//     await course.update({ title, description });
+//     res.status(200).json(course);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Failed to update course' });
+//   }
+// });
 
 // Delete a course (Instructors only)
-router.delete('/courses/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+router.delete('/course/delete/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+  const courseId = req.params.id;
   try {
-    const { id } = req.params;
-    const course = await Course.findByPk(id);
-    if (course.instructorId !== req.user.id) {
-      return res.status(403).json({ error: 'Unauthorized' });
-    }
-    await course.destroy();
-    res.status(200).json({ message: 'Course deleted successfully' });
+    await Course.destroy({ where: { id: courseId } });
+    req.flash('success', 'Course deleted successfully');
+    res.redirect('/courses');
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete course' });
+    console.error('Error deleting course:', error);
+    req.flash('error', 'Failed to delete course');
+    res.redirect('/courses');
   }
 });
 
+// router.delete('/courses/delete/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const course = await Course.findByPk(id);
+//     if (course.instructorId !== req.user.id) {
+//       return res.status(403).json({ error: 'Unauthorized' });
+//     }
+//     await course.destroy();
+//     res.status(200).json({ message: 'Course deleted successfully' });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Failed to delete course' });
+//   }
+// });
+
 // Get all courses (Students)
-router.get('/courses', async (req, res) => {
+router.get('/courses', authMiddleware, async (req, res) => {
   try {
     const courses = await Course.findAll();
-    res.status(200).json(courses);
+    const myCourses = await Enrollment.findAll({
+      where: { studentId: req.user.id },
+      include: Course
+    }).map(enrollment => enrollment.Course);
+    res.render('courses', { courses, myCourses });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch courses' });
+    console.error('Error fetching courses:', error);
+    req.flash('error', 'Failed to load courses.');
+    res.redirect('courses');
+    // res.status(500).json({ error: 'Failed to fetch courses' });
   }
 });
 
@@ -87,10 +121,12 @@ router.post('/enroll/:courseId', authMiddleware, checkRole(['student']), async (
     const {courseId} = req.params;
     const userId = req.user.id; // Assuming the authenticated user ID is available in req.user
 
+    console.log('Enrolling user ID:', userId);
     // Check if the course exists
     const course = await Course.findOne({ where: { id: courseId } });
     if (!course) {
-        return res.status(404).json({ message: 'Course not found' });
+      req.flash('error', 'Course not found');
+      return res.redirect('/courses');
     }
 
     // Check if the student is already enrolled
@@ -103,7 +139,13 @@ router.post('/enroll/:courseId', authMiddleware, checkRole(['student']), async (
     }
 
     // Enroll the student in the course
-    await Enrollment.create({ studentId: userId, courseId });
+    await Enrollment.create({ 
+      studentId: userId, 
+      courseId,
+      userId 
+    });
+
+    console.log('Enrollment successful');
 
     req.flash('success', 'You have successfully enrolled in the course.');
     res.redirect('/courses');

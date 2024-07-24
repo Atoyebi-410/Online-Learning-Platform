@@ -44,6 +44,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes)
 app.use('/api/course', courseRoutes);
 app.use('/api/lesson', lessonRoutes);
+app.use((req, res, next) => {
+  res.isAuthenticated = req.user ? true : false;
+  next();
+});
+
 
 // app.use((req, res, next) => {
 //   res.locals.success = req.flash('success');
@@ -89,15 +94,32 @@ app.get('/upload', authMiddleware, checkRole('instructor'), async (req, res) => 
   }
 });
 
+// route to render edit course page
+app.get('/course/edit/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+  const courseId = req.params.id;
+  try {
+    const course = await Course.findByPk(courseId);
+    if (!course) {
+      req.flash('error', 'Course not found');
+      return res.redirect('/upload.ejs');
+    }
+    res.render('editCourse.ejs', { course });
+  } catch (error) {
+    console.error('Error fetching course:', error);
+    req.flash('error', 'Server error');
+    res.redirect('/upload.ejs');
+  }
+});
+
 // render upload page
 // app.get('/courses', (req, res) => {
 //   res.render('../../frontend/views/courses.ejs', { message: req.flash('message') });
 // });
 
-app.get('/courses', async (req, res) => {
+app.get('/courses', authMiddleware, async (req, res) => {
   try {
       const courses = await Course.findAll({
-        attributes: ['id', 'title', 'briefDescription']
+        attributes: ['id', 'title', 'description']
       });
       res.render('../../frontend/views/courses', { courses, loggedIn: req.isAuthenticated() });
   } catch (error) {

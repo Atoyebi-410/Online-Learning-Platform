@@ -47,6 +47,10 @@ body {
   transition: 0.3s;
 }
 
+.course-tab{
+  margin-top: 50px;
+}
+
 /* line 15 */
 a,
 .button {
