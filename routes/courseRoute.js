@@ -55,20 +55,6 @@ router.post('/update/:id', authMiddleware, checkRole(['instructor']), async (req
   }
 });
 
-// router.put('/courses/update/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { title, description } = req.body;
-//     const course = await Course.findByPk(id);
-//     if (course.instructorId !== req.user.id) {
-//       return res.status(403).json({ error: 'Unauthorized' });
-//     }
-//     await course.update({ title, description });
-//     res.status(200).json(course);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Failed to update course' });
-//   }
-// });
 
 // Delete a course (Instructors only)
 router.post('/delete/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
