@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(flash());
 
 // Middleware to make static files readable
-app.use(express.static('../frontend/public'));
+app.use(express.static('public'));
 
 // Initialize session
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
@@ -60,7 +60,7 @@ app.use((req, res, next) => {
 app.get('/', async (req, res) => {
   try {
       const courses = await Course.findAll();
-      res.render('../../frontend/views/index.ejs', { courses });
+      res.render('index', { courses });
   } catch (error) {
       console.error('Error fetching courses:', error);
       res.status(500).json({ error: 'Server error' });
@@ -69,12 +69,12 @@ app.get('/', async (req, res) => {
 
 
 app.get('/register', (req, res) => {
-  res.render('../../frontend/views/register.ejs', { messages: req.flash() || {} });
+  res.render('register', { messages: req.flash() || {} });
 });
 
 // render login page
 app.get('/login', (req, res) => {
-  res.render('../../frontend/views/login.ejs', { messages: req.flash() || {} });
+  res.render('login', { messages: req.flash() || {} });
 });
 
 // // render upload page
@@ -86,7 +86,7 @@ app.get('/login', (req, res) => {
 app.get('/upload', authMiddleware, checkRole('instructor'), async (req, res) => {
   try {
       const courses = await Course.findAll({ where: { instructorId: req.user.id } });
-      res.render('../../frontend/views/upload.ejs', { courses, error: req.flash('error'), success: req.flash('success') });
+      res.render('upload', { courses, error: req.flash('error'), success: req.flash('success') });
   } catch (error) {
       console.error('Error fetching courses:', error);
       req.flash('error', 'Server error');
@@ -101,13 +101,13 @@ app.get('/course/edit/:id', authMiddleware, checkRole(['instructor']), async (re
     const course = await Course.findByPk(courseId);
     if (!course) {
       req.flash('error', 'Course not found');
-      return res.redirect('/upload.ejs');
+      return res.redirect('upload');
     }
-    res.render('editCourse.ejs', { course });
+    res.render('editCourse', { course });
   } catch (error) {
     console.error('Error fetching course:', error);
     req.flash('error', 'Server error');
-    res.redirect('/upload.ejs');
+    res.redirect('upload');
   }
 });
 
@@ -121,7 +121,7 @@ app.get('/courses', authMiddleware, async (req, res) => {
       const courses = await Course.findAll({
         attributes: ['id', 'title', 'description']
       });
-      res.render('../../frontend/views/courses', { courses, loggedIn: req.isAuthenticated() });
+      res.render('courses', { courses, loggedIn: req.isAuthenticated() });
   } catch (error) {
       console.error('Error fetching courses:', error);
       res.status(500).json({ error: 'Server error' });
@@ -132,7 +132,7 @@ app.get('/courses', authMiddleware, async (req, res) => {
 app.get('/logout', (req, res) => {
   // Clear any session/token information from client-side storage (e.g., cookies, localStorage)
   res.clearCookie('jwtToken'); // Example for clearing cookie-based token
-  res.status(200).render('../../frontend/views/index.ejs', { message: 'Logout successful' });
+  res.status(200).render('index', { message: 'Logout successful' });
 });
 
 // Synchronize the database

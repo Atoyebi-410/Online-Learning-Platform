@@ -8,7 +8,7 @@ const { Course, Enrollment } = require('../models');
 router.get('/upload', authMiddleware, checkRole('instructor'), async (req, res) => {
   try {
       const courses = await Course.findAll({ where: { instructorId: req.user.id } });
-      res.render('../../frontend/views/upload.ejs', { courses, error: req.flash('error'), success: req.flash('success') });
+      res.render('upload', { courses, error: req.flash('error'), success: req.flash('success') });
   } catch (error) {
       console.error('Error fetching courses:', error);
       req.flash('error', 'Server error');
@@ -41,7 +41,7 @@ router.post('/upload', [
 });
 
 // Update a course (Instructors only)
-router.put('/course/update/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+router.post('/update/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
   const courseId = req.params.id;
   const { title, description } = req.body;
   try {
@@ -71,16 +71,16 @@ router.put('/course/update/:id', authMiddleware, checkRole(['instructor']), asyn
 // });
 
 // Delete a course (Instructors only)
-router.delete('/course/delete/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
+router.post('/delete/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
   const courseId = req.params.id;
   try {
     await Course.destroy({ where: { id: courseId } });
     req.flash('success', 'Course deleted successfully');
-    res.redirect('/courses');
+    res.redirect('/upload');
   } catch (error) {
     console.error('Error deleting course:', error);
     req.flash('error', 'Failed to delete course');
-    res.redirect('/courses');
+    res.redirect('/upload');
   }
 });
 

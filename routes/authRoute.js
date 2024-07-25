@@ -161,7 +161,7 @@ router.get('/verify/:token', async (req, res) => {
       // Determine the redirect URL based on the user's role
       const redirectUrl = user.role === 'instructor' ? '/upload' : '/courses';
   
-      res.status(200).render('../../frontend/views/verify.ejs',{ message: 'Your email has been verified, you will be redirected shortly', authToken, redirectUrl });
+      res.status(200).render('verify',{ message: 'Your email has been verified, you will be redirected shortly', authToken, redirectUrl });
     } catch (error) {
       console.error('Error verifying email:', error);
       res.status(500).json({ error: 'Server error' });
@@ -182,7 +182,9 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
 router.get('/logout', (req, res) => {
   // Clear any session/token information from client-side storage (e.g., cookies, localStorage)
   res.clearCookie('jwtToken'); // Example for clearing cookie-based token
-  res.status(200).redirect('../../frontend/views/index.ejs', { message: 'Logout successful' });
+  // res.status(200).redirect('index', { message: 'Logout successful' });
+  req.flash('error', 'Server error');
+  res.redirect('index', { message: 'Logout successful' });
 });
 
 

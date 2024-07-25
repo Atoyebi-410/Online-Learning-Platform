@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/owl.carousel.min.css">
-    <link rel="stylesheet" href="css/magnific-popup.css">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/themify-icons.css">
-    <link rel="stylesheet" href="css/nice-select.css">
-    <link rel="stylesheet" href="css/flaticon.css">
-    <link rel="stylesheet" href="css/gijgo.css">
-    <link rel="stylesheet" href="css/animate.css">
-    <link rel="stylesheet" href="css/slicknav.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="/css/magnific-popup.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/themify-icons.css">
+    <link rel="stylesheet" href="/css/nice-select.css">
+    <link rel="stylesheet" href="/css/flaticon.css">
+    <link rel="stylesheet" href="/css/gijgo.css">
+    <link rel="stylesheet" href="/css/animate.css">
+    <link rel="stylesheet" href="/css/slicknav.css">
+    <link rel="stylesheet" href="/css/style.css">
     <title>Document</title>
 </head>
 <body>
@@ -65,64 +65,25 @@
     <!-- header-end -->
 
 <div class="container register">
-    <form action="/api/course/upload" method="POST">
-        <div>
-            <h3>Upload Course</h3>
-        </div>
-        <% if (locals.messages && locals.messages.errors && locals.messages.errors.length > 0) { %>
-            <div class="alert alert-danger">
-                <% messages.errors.forEach(function(error) { %>
-                    <p><%= error.msg %></p>
-                <% }) %>
-            </div>
-        <% } %>
-        <% if (locals.messages && locals.messages.success) { %>
-            <div class="alert alert-success">
-                <p><%= messages.success %></p>
-            </div>
-        <% } %>
-        <% if (locals.messages && locals.messages.error) { %>
-            <div class="alert alert-danger">
-                <p><%= messages.error %></p>
-            </div>
-        <% } %>
+    <div>
+        <h3>Update Course</h3>
+    </div>
+    <form action="/api/course/update/<%= course.id %>" method="post">  
         <div class="mb-3">
             <label for="exampleInputText1" class="form-label">Title</label>
-            <input type="text" name="title" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
+            <input type="text" name="title" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="<%= course.title %>" required>
         </div>
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Description</label>
-            <textarea type="text" name="description" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required></textarea>
+            <textarea type="text" name="description" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required><%= course.description %></textarea>
         </div>
         <div class="col-xl-12">
-            <button type="submit" class="boxed_btn_orange">Upload</button>
+            <button type="submit" class="boxed_btn_orange">Update</button>
         </div>
         <!-- <div>
             <a href="/auth/google">Register with Google</a>
         </div> -->
       </form>
-</div>
-<div class="container">
-    <% courses.forEach(course => { %>
-        <div class="course">
-            <h2><%= course.title %></h2>
-            <p><%= course.description %></p>
-            <a href="/course/<%= course.id %>">View Course</a>
-        </div>
-        <div class="row">
-            <div class="col">
-                <a class="boxed_btn_orange" href="/course/edit/<%= course.id %>">Update</a>
-                <!-- <form action="/course/update/<%= course.id %>" method="post">
-                    <button type="submit" class="boxed_btn_orange">Update</button>
-                </form> -->
-            </div>
-            <div class="col">
-                <form action="/course/delete/<%= course.id %>" method="post">
-                    <button type="submit" class="boxed_btn_orange">Delete</button>
-                </form>
-            </div>
-        </div>
-    <% }); %>
 </div>
 
 

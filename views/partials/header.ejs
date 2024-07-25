@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/animate.css">
     <link rel="stylesheet" href="css/slicknav.css">
     <link rel="stylesheet" href="css/style.css">
-    <title>Document</title>
+    <title>Edumark</title>
 </head>
 <body>
     <header>
@@ -34,7 +34,7 @@
                                 <nav>
                                     <ul id="navigation">
                                         <li><a class="active" href="/">home</a></li>
-                                        <li><a href="#">Courses<i class="ti-angle-down"></i></a>
+                                        <li><a href="/course">Courses<i class="ti-angle-down"></i></a>
                                             <ul class="submenu">
                                                 <li><a href="course_details.html">course details</a></li>
                                                 <li><a href="elements.html">elements</a></li>
@@ -46,14 +46,45 @@
                                 </nav>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                        <% if (locals.isAuthenticated) { %>
+                                <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                                    <div class="log_chat_area d-flex align-items-center">
+                                        <a href="/logout" class="login popup-with-form">
+                                            <i class="flaticon-user"></i>
+                                            <span>log out</span>
+                                        </a>
+                                    </div>
+                                </div>
+                        <% } else { %>
+                                <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                                    <div class="log_chat_area d-flex align-items-center">
+                                        <a href="/login" class="login popup-with-form">
+                                            <i class="flaticon-user"></i>
+                                            <span>log in</span>
+                                        </a>
+                                        <div class="live_chat_btn">
+                                            <a class="boxed_btn_orange signup popup-with-form" href="/register">
+                                                <i class="fa fa-phone"></i>
+                                                <span>Sign Up</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                        <% } %>
+                        <!-- <div class="col-xl-3 col-lg-3 d-none d-lg-block">
                             <div class="log_chat_area d-flex align-items-center">
-                                <a href="/logout" class="login popup-with-form">
+                                <a href="/login" class="login popup-with-form">
                                     <i class="flaticon-user"></i>
-                                    <span>log Out</span>
+                                    <span>log in</span>
                                 </a>
+                                <div class="live_chat_btn">
+                                    <a class="boxed_btn_orange signup popup-with-form" href="/register">
+                                        <i class="fa fa-phone"></i>
+                                        <span>Sign Up</span>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-12">
                             <div class="mobile_menu d-block d-lg-none"></div>
                         </div>
@@ -63,29 +94,3 @@
         </div>
     </header>
     <!-- header-end -->
-
-<div class="container register">
-    <form action="/course/update/<%= course.id %>" method="POST">
-        <div>
-            <h3>Update Course</h3>
-        </div>
-        
-        <div class="mb-3">
-            <label for="exampleInputText1" class="form-label">Title</label>
-            <input type="text" name="title" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value="<%= course.title %>" required>
-        </div>
-        <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Description</label>
-            <textarea type="text" name="description" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required><%= course.description %></textarea>
-        </div>
-        <div class="col-xl-12">
-            <button type="submit" class="boxed_btn_orange">Update</button>
-        </div>
-        <!-- <div>
-            <a href="/auth/google">Register with Google</a>
-        </div> -->
-      </form>
-</div>
-
-
-<%- include("partials/footer.ejs") %>
