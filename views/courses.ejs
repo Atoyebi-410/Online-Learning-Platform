@@ -110,8 +110,13 @@
     <div id="myCourses" class="tab-content" style="display:none;">
         <% if (locals.myCourses && locals.myCourses.length > 0) { %>
             <% myCourses.forEach(course => { %>
+                <h2><a href="/courses/<%= course.id %>"><%= course.title %></a></h2>
                 <div class="course">
-                    <h2><a href="/courses/<%= course.id %>"><%= course.title %></a></h2>
+                    <div class="thumb">
+                        <a href="#">
+                            <img src="img/courses/1.png" alt="">
+                        </a>
+                    </div>
                 </div>
             <% }); %>
 
@@ -131,4 +136,4 @@
         }
     </script>
     
-            
+    

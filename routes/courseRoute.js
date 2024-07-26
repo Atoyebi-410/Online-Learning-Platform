@@ -70,20 +70,6 @@ router.post('/delete/:id', authMiddleware, checkRole(['instructor']), async (req
   }
 });
 
-// router.delete('/courses/delete/:id', authMiddleware, checkRole(['instructor']), async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const course = await Course.findByPk(id);
-//     if (course.instructorId !== req.user.id) {
-//       return res.status(403).json({ error: 'Unauthorized' });
-//     }
-//     await course.destroy();
-//     res.status(200).json({ message: 'Course deleted successfully' });
-//   } catch (error) {
-//     res.status(500).json({ error: 'Failed to delete course' });
-//   }
-// });
-
 // Get all courses (Students)
 router.get('/courses', authMiddleware, async (req, res) => {
   try {

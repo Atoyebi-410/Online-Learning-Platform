@@ -7,12 +7,14 @@ const courseRoutes = require('./routes/courseRoute');
 const lessonRoutes = require('./routes/lessonRoute');
 const bodyParser = require('body-parser');
 const Course = require('./models/course.js');
+const User = require('./models/user.js')
 const cookieParser = require('cookie-parser');
 const path = require('path')
 const flash = require('connect-flash');
-const { Enrollment} = require('./models')
+const Enrollment = require('./models/enrollment.js')
 const {authMiddleware, checkRole} = require('./middleware/authMiddleware.js');
 require('dotenv').config();
+require('./models/index.js')
 
 const app = express();
 
@@ -111,17 +113,45 @@ app.get('/course/edit/:id', authMiddleware, checkRole(['instructor']), async (re
   }
 });
 
-// render upload page
-// app.get('/courses', (req, res) => {
-//   res.render('../../frontend/views/courses.ejs', { message: req.flash('message') });
-// });
 
 app.get('/courses', authMiddleware, async (req, res) => {
   try {
       const courses = await Course.findAll({
         attributes: ['id', 'title', 'description']
       });
-      res.render('courses', { courses, loggedIn: req.isAuthenticated() });
+
+      // Fetch enrolled courses for the logged-in user
+      const userWithCourses = await User.findByPk(req.user.id, {
+        include: [
+          {
+            model: Course,
+            as: 'enrolledCourses', // This should match the alias defined in the associations
+            attributes: ['id', 'title', 'description']
+          }
+        ]
+      });
+
+      // Extract enrolled courses
+      const myCoursesList = userWithCourses.enrolledCourses;
+
+      // const myCourses = await Enrollment.findAll({
+      //   where: { studentId: req.user.id },
+      //   include: [
+      //     {
+      //       model: Course,
+      //       attributes: ['id', 'title', 'description'],
+      //       as: 'enrolledCourses'
+      //     }
+      //   ]
+      // });
+
+      // const myCoursesList = myCourses.map(enrollment => enrollment.enrolledCourses);
+
+      res.render('courses', { 
+        courses, 
+        myCourses: myCoursesList,
+        loggedIn: req.isAuthenticated() 
+      });
   } catch (error) {
       console.error('Error fetching courses:', error);
       res.status(500).json({ error: 'Server error' });
@@ -136,7 +166,7 @@ app.get('/logout', (req, res) => {
 });
 
 // Synchronize the database
-sequelize.sync({ alter: true })
+sequelize.sync({ force: true })
   .then(() => {
     console.log('Database synchronized');
   })

@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Enrollment = sequelize.define('Enrollment', {
-  studentId: {
+  userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -17,11 +17,11 @@ const Enrollment = sequelize.define('Enrollment', {
       model: 'Courses',
       key: 'id',
     },
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false, // Ensure this matches your database schema
-  },
+  }
+  // userId: {
+  //   type: DataTypes.INTEGER,
+  //   allowNull: false, // Ensure this matches your database schema
+  // },
 }, {
   timestamps: true,
 });
